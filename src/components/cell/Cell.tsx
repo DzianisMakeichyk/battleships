@@ -7,6 +7,7 @@ export interface CellProps {
 	isHit: boolean;
 	isShip: boolean;
 	shipId: number;
+  color?: string;
 	onClick: () => void;
 }
 

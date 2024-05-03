@@ -98,27 +98,50 @@ const AreaContainer: React.FC = () => {
 		return true;
 	};
 
-	const handleShot = (row: number, col: number): void => {
-		const newGrid: Grid = [...grid];
+  const isWithinGrid = (row: number, col: number): boolean => row >= 0 && row < 10 && col >= 0 && col < 10;
 
-		if (newGrid[row][col].isHit) return;
+  const handleShot = (row: number, col: number): void => {
+    const newGrid: Grid = [...grid];
 
-		newGrid[row][col].isHit = true;
-		setGrid(newGrid);
+    if (newGrid[row][col].isHit) return;
 
-		if (!newGrid[row][col].isShip) return;
+    newGrid[row][col].isHit = true;
+    setGrid(newGrid);
 
-		setShipPopUp(true);
+    if (!newGrid[row][col].isShip) return;
 
-		const shipId = newGrid[row][col].shipId; // Get the ship ID from the cell
-		const ship = ships.find((ship) => ship.id === shipId);
-		if (!ship) return;
+    setShipPopUp(true);
 
-		ship.framesHit++;
-		if (checkIfShipSunk(ship)) {
-			setShipKillNotification(`You destroyed ${ship.name}!`);
-		}
-	};
+    const shipId = newGrid[row][col].shipId;
+    const ship = ships.find(ship => ship.id === shipId);
+    if (!ship) return;
+
+    ship.framesHit++;
+    if (checkIfShipSunk(ship)) {
+        setShipKillNotification(`You destroyed ${ship.name}!`);
+
+        // Find cells around the destroyed ship and mark them as hit
+        const { position } = ship;
+        const { row: shipRow, col: shipCol, horizontal } = position;
+        const aroundShip: [number, number][] = [];
+
+        for (let i = shipRow - 1; i <= shipRow + (horizontal ? 1 : ship.length); i++) {
+            for (let j = shipCol - 1; j <= shipCol + (horizontal ? ship.length : 1); j++) {
+                if (isWithinGrid(i, j) && !newGrid[i][j].isHit) {
+                    aroundShip.push([i, j]);
+                }
+            }
+        }
+
+        aroundShip.forEach(([r, c]) => {
+            newGrid[r][c].isHit = true;
+            newGrid[r][c].color = "red";
+        });
+
+        setGrid(newGrid);
+    }
+};
+
 
 	const checkIfShipSunk = (ship: ShipProps): boolean => {
 		const isSunk = ship.framesHit === ship.length;
