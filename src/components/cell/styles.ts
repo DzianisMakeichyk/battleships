@@ -4,5 +4,5 @@ import { CellProps } from './Cell';
 export const CellStyled = styled.div<CellProps>`
 	width: 30px;
 	height: 30px;
-	background-color: ${({ isHit, isShip }) => (isHit ? (isShip ? 'blue' : 'red') : 'gray')};
+	background-color: ${({ isHit, isShip, isHidden }) => (isHidden ? isHit ? (isShip ? 'blue' : 'red') : 'gray' : isShip ? 'blue' : 'gray')};
 `;

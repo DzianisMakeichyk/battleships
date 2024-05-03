@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-import { Area, ShipProps, CellProps } from '../components';
+import { Area, ShipProps, CellProps, Notification } from '../components';
 
 type Grid = CellProps[][];
 
 const initialGrid: Grid = Array.from({ length: 10 }, () =>
 	Array.from({ length: 10 }, () => ({
-		isHidden: true,
 		isHit: false,
 		isShip: false,
 		shipId: 0,
@@ -14,13 +13,17 @@ const initialGrid: Grid = Array.from({ length: 10 }, () =>
 	}))
 );
 
+const ships: ShipProps[] = [
+	{ id: 1, name: 'Battleship 1', length: 5, framesHit: 0, position: { row: 0, col: 0 } },
+	{ id: 2, name: 'Battleship 2', length: 4, framesHit: 0, position: { row: 0, col: 0 } },
+	{ id: 3, name: 'Battleship 3', length: 4, framesHit: 0, position: { row: 0, col: 0 } },
+];
+
 const AreaContainer: React.FC = () => {
 	const [grid, setGrid] = useState<Grid>(initialGrid);
-	const [shipPopUp, setShipPopUp] = useState<boolean>(false);
-	const [shipKillNotification, setShipKillNotification] = useState<string | null>(null);
-	const [ships, setShips] = useState<ShipProps[]>([]);
 	const placedShipsRef = useRef<boolean>(false);
-	const popUpTimerRef = useRef<NodeJS.Timeout | null>(null);
+	const [notification, setNotification] = useState<string | null>(null);
+	const [destroyedShipsCount, setDestroyedShipsCount] = useState<number>(0);
 
 	useEffect(() => {
 		if (placedShipsRef.current) return;
@@ -30,36 +33,22 @@ const AreaContainer: React.FC = () => {
 	}, []);
 
 	useEffect(() => {
-		if (!shipPopUp) return;
-
-		popUpTimerRef.current = setTimeout(() => {
-			setShipPopUp(false);
-			clearTimeout(popUpTimerRef.current!);
-		}, 5000);
-
-		return () => {
-			if (popUpTimerRef.current) {
-				clearTimeout(popUpTimerRef.current);
-			}
-		};
-	}, [shipPopUp]);
+		if (destroyedShipsCount === ships.length) {
+			setNotification("Congratulations! You've destroyed all ships!");
+		}
+	}, [destroyedShipsCount]);
 
 	const placeShips = (): void => {
-		const ships: ShipProps[] = [
-			{ id: 1, name: 'Battleship 1', length: 5, framesHit: 0, position: { row: 0, col: 0 } },
-			{ id: 2, name: 'Battleship 2', length: 4, framesHit: 0, position: { row: 0, col: 0 } },
-			{ id: 3, name: 'Battleship 3', length: 4, framesHit: 0, position: { row: 0, col: 0 } },
-		];
-		setShips(ships);
+		const newGrid: Grid = [...initialGrid];
 
-		ships.forEach((ship) => placeShipRandomly(ship));
+		ships.forEach((ship) => placeShipRandomly(ship, newGrid));
+
+		setGrid(newGrid);
 	};
 
 	const getRandomNumber = (max: number): number => Math.floor(Math.random() * max);
 
-	const placeShipRandomly = (ship: ShipProps): void => {
-		const newGrid: Grid = [...grid];
-
+	const placeShipRandomly = (ship: ShipProps, newGrid: Grid): void => {
 		let row: number;
 		let col: number;
 		let horizontal: boolean;
@@ -77,8 +66,6 @@ const AreaContainer: React.FC = () => {
 			newGrid[curRow][curCol].isShip = true;
 			newGrid[curRow][curCol].shipId = ship.id; // Store ship ID in each cell
 		}
-
-		setGrid(newGrid);
 	};
 
 	const isWithinGridAndHasShip = (i: number, j: number, grid: Grid): boolean => i >= 0 && i < 10 && j >= 0 && j < 10 && grid[i][j].isShip;
@@ -98,50 +85,53 @@ const AreaContainer: React.FC = () => {
 		return true;
 	};
 
-  const isWithinGrid = (row: number, col: number): boolean => row >= 0 && row < 10 && col >= 0 && col < 10;
+	const isWithinGrid = (row: number, col: number): boolean => row >= 0 && row < 10 && col >= 0 && col < 10;
 
-  const handleShot = (row: number, col: number): void => {
-    const newGrid: Grid = [...grid];
+	const handleShot = (row: number, col: number): void => {
+		const newGrid: Grid = [...grid];
+		if (newGrid[row][col].isHit) return;
 
-    if (newGrid[row][col].isHit) return;
+		newGrid[row][col].isHit = true;
+		setGrid(newGrid);
 
-    newGrid[row][col].isHit = true;
-    setGrid(newGrid);
+		if (!newGrid[row][col].isShip) return;
 
-    if (!newGrid[row][col].isShip) return;
+		setNotification('You hit a ship!');
 
-    setShipPopUp(true);
+		const shipId = newGrid[row][col].shipId;
+		const ship = ships.find((ship) => ship.id === shipId);
+		if (!ship) return;
 
-    const shipId = newGrid[row][col].shipId;
-    const ship = ships.find(ship => ship.id === shipId);
-    if (!ship) return;
+		ship.framesHit++;
+		if (!checkIfShipSunk(ship)) return;
 
-    ship.framesHit++;
-    if (checkIfShipSunk(ship)) {
-        setShipKillNotification(`You destroyed ${ship.name}!`);
+		setNotification(`You destroyed ${ship.name}!`);
+		setDestroyedShipsCount((prevCount) => prevCount + 1);
 
-        // Find cells around the destroyed ship and mark them as hit
-        const { position } = ship;
-        const { row: shipRow, col: shipCol, horizontal } = position;
-        const aroundShip: [number, number][] = [];
+		const aroundShip = findCellsAroundShip(ship, newGrid);
+		aroundShip.forEach(([r, c]) => {
+			newGrid[r][c].isHit = true;
+			newGrid[r][c].color = 'red';
+		});
 
-        for (let i = shipRow - 1; i <= shipRow + (horizontal ? 1 : ship.length); i++) {
-            for (let j = shipCol - 1; j <= shipCol + (horizontal ? ship.length : 1); j++) {
-                if (isWithinGrid(i, j) && !newGrid[i][j].isHit) {
-                    aroundShip.push([i, j]);
-                }
-            }
-        }
+		setGrid(newGrid);
+	};
 
-        aroundShip.forEach(([r, c]) => {
-            newGrid[r][c].isHit = true;
-            newGrid[r][c].color = "red";
-        });
+	const findCellsAroundShip = (ship: ShipProps, grid: Grid): [number, number][] => {
+		const { position } = ship;
+		const { row: shipRow, col: shipCol, horizontal } = position;
+		const aroundShip: [number, number][] = [];
 
-        setGrid(newGrid);
-    }
-};
+		for (let i = shipRow - 1; i <= shipRow + (horizontal ? 1 : ship.length); i++) {
+			for (let j = shipCol - 1; j <= shipCol + (horizontal ? ship.length : 1); j++) {
+				if (isWithinGrid(i, j) && !grid[i][j].isHit) {
+					aroundShip.push([i, j]);
+				}
+			}
+		}
 
+		return aroundShip;
+	};
 
 	const checkIfShipSunk = (ship: ShipProps): boolean => {
 		const isSunk = ship.framesHit === ship.length;
@@ -152,24 +142,38 @@ const AreaContainer: React.FC = () => {
 		return false;
 	};
 
-	const handleClosePopUp = (): void => {
-		setShipPopUp(false);
+	const handleCloseNotification = (): void => {
+		setNotification(null);
 	};
 
-	const handleCloseNotification = (): void => {
-		setShipKillNotification(null);
+	const handleRestartGame = (): void => {
+		const newGrid: Grid = Array.from({ length: 10 }, () =>
+			Array.from({ length: 10 }, () => ({
+				isHit: false,
+				isShip: false,
+				shipId: 0,
+				onClick: () => {},
+			}))
+		);
+
+		setGrid(newGrid);
+		setNotification(null);
+		setDestroyedShipsCount(0);
+
+		ships.forEach((ship) => {
+			ship.framesHit = 0;
+			ship.position = { row: 0, col: 0, horizontal: false };
+		});
+
+		placedShipsRef.current = false;
 	};
 
 	return (
-		<Area
-			grid={grid}
-			shipPopUp={shipPopUp}
-			shipKillNotification={shipKillNotification}
-			ships={ships}
-			onShot={handleShot}
-			onClosePopUp={handleClosePopUp}
-			onCloseNotification={handleCloseNotification}
-		/>
+		<>
+			{notification && <Notification message={notification} onClose={handleCloseNotification} />}
+			<Area grid={grid} ships={ships} onShot={handleShot}/>
+			{destroyedShipsCount === ships.length && <button onClick={handleRestartGame}>Restart the game</button>}
+		</>
 	);
 };
 

@@ -6,12 +6,9 @@ import { Cell, CellProps } from '../cell';
 
 interface AreaProps {
 	grid: CellProps[][];
-	shipPopUp: boolean;
-	shipKillNotification: string | null;
 	ships: ShipProps[];
+	showBattleArea?: boolean;
 	onShot: (row: number, col: number) => void;
-	onClosePopUp: () => void;
-	onCloseNotification: () => void;
 }
 
 const GridContainer = styled.div`
@@ -21,27 +18,15 @@ const GridContainer = styled.div`
 	gap: 2px;
 `;
 
-const Area: React.FC<AreaProps> = ({ grid, shipPopUp, shipKillNotification, ships, onShot, onClosePopUp, onCloseNotification }) => {
+const Area: React.FC<AreaProps> = ({ grid, ships, onShot, showBattleArea = false }) => {
 	return (
 		<div>
-			{shipPopUp && (
-				<div>
-					<h3>You hit a ship!</h3>
-					<button onClick={onClosePopUp}>Close</button>
-				</div>
-			)}
-			{shipKillNotification && (
-				<div>
-					<h3>{shipKillNotification}</h3>
-					<button onClick={onCloseNotification}>Close</button>
-				</div>
-			)}
 			<GridContainer>
 				{grid.map((row, rowIndex) =>
 					row.map((cell, colIndex) => (
 						<Cell
 							key={`${rowIndex}-${colIndex}`}
-							isHidden={!cell.isHit}
+              isHidden={!showBattleArea}
 							isHit={cell.isHit}
 							shipId={cell.shipId}
 							isShip={cell.isShip}
