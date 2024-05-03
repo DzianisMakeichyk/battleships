@@ -3,6 +3,7 @@ import { ThemeProvider } from 'styled-components';
 
 import { GlobalStyles } from './styles/globalStyles';
 import { lightTheme, darkTheme } from './styles/Themes';
+import { AreaContainer } from './container/AreaContainer';
 
 function App() {
 	const [themeName, setThemeName] = useState('light');
@@ -14,11 +15,9 @@ function App() {
 		<div className="App">
 			<ThemeProvider theme={theme}>
 				<GlobalStyles />
-				<header className="App-header">
-					<p>
-						Edit <code>src/App.tsx</code> and save to reload.
-					</p>
-				</header>
+				<main>
+					<AreaContainer />
+				</main>
 			</ThemeProvider>
 		</div>
 	);
