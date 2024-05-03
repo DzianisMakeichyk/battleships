@@ -15,5 +15,5 @@ export const darkTheme = {
 	hover: {
 		body: '#fff',
 		text: '#1c2226',
-  }
+	},
 };
