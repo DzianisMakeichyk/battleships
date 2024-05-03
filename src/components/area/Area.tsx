@@ -43,6 +43,7 @@ const Area: React.FC<AreaProps> = ({ grid, shipPopUp, shipKillNotification, ship
 							key={`${rowIndex}-${colIndex}`}
 							isHidden={!cell.isHit}
 							isHit={cell.isHit}
+							shipId={cell.shipId}
 							isShip={cell.isShip}
 							onClick={() => onShot(rowIndex, colIndex)}
 						/>

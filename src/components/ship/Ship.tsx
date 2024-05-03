@@ -5,6 +5,7 @@ export interface ShipProps {
 	name: string;
 	length: number;
 	framesHit: number;
+	position: { row: number; col: number; horizontal?: boolean };
 }
 
 const Ship: FC<{ ship: ShipProps }> = ({ ship }) => {
