@@ -11,8 +11,18 @@ export interface CellProps {
 	onClick: () => void;
 }
 
-const Cell: FC<CellProps> = ({ ...rest }) => {
-	return <CellStyled {...rest} />;
+const Cell: FC<CellProps> = ({ isHit, isShip, isHidden, shipId, onClick }) => {
+	return (
+		<CellStyled
+			$isHit={isHit}
+			$isShip={isShip}
+			$isHidden={isHidden}
+			onClick={onClick}
+			data-testid="ship-cell"
+			data-shipid={shipId}
+			data-ishit={isHit}
+		/>
+	);
 };
 
 export { Cell };

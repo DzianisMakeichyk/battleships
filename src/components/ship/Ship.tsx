@@ -8,8 +8,8 @@ export interface ShipProps {
 	position: { row: number; col: number; horizontal?: boolean };
 }
 
-const Ship: FC<{ ship: ShipProps }> = ({ ship }) => {
-	return <div>{ship.name}</div>;
+const Ship: FC<ShipProps> = ({ name }) => {
+	return <>{name}</>;
 };
 
 export { Ship };

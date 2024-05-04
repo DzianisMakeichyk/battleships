@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import styled from 'styled-components';
 
 import { ShipProps, Ship } from '../ship';
@@ -18,18 +18,18 @@ const GridContainer = styled.div`
 	gap: 2px;
 `;
 
-const Area: React.FC<AreaProps> = ({ grid, ships, onShot, showBattleArea = false }) => {
+const Area: FC<AreaProps> = ({ grid, ships, onShot, showBattleArea = false }) => {
 	return (
-		<div>
+		<>
 			<GridContainer>
 				{grid.map((row, rowIndex) =>
-					row.map((cell, colIndex) => (
+					row.map(({ isHit, shipId, isShip }, colIndex) => (
 						<Cell
 							key={`${rowIndex}-${colIndex}`}
-              isHidden={!showBattleArea}
-							isHit={cell.isHit}
-							shipId={cell.shipId}
-							isShip={cell.isShip}
+							isHidden={!showBattleArea}
+							isHit={isHit}
+							shipId={shipId}
+							isShip={isShip}
 							onClick={() => onShot(rowIndex, colIndex)}
 						/>
 					))
@@ -37,10 +37,10 @@ const Area: React.FC<AreaProps> = ({ grid, ships, onShot, showBattleArea = false
 			</GridContainer>
 			<div>
 				{ships.map((ship) => (
-					<Ship key={ship.id} ship={ship} />
+					<Ship key={ship.id} {...ship} />
 				))}
 			</div>
-		</div>
+		</>
 	);
 };
 

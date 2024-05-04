@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { FC, useState, useEffect, useRef } from 'react';
 
 import { Area, ShipProps, CellProps, Notification } from '../components';
 
@@ -19,7 +19,7 @@ const ships: ShipProps[] = [
 	{ id: 3, name: 'Battleship 3', length: 4, framesHit: 0, position: { row: 0, col: 0 } },
 ];
 
-const AreaContainer: React.FC = () => {
+const AreaContainer: FC = () => {
 	const [grid, setGrid] = useState<Grid>(initialGrid);
 	const placedShipsRef = useRef<boolean>(false);
 	const [notification, setNotification] = useState<string | null>(null);
@@ -171,7 +171,7 @@ const AreaContainer: React.FC = () => {
 	return (
 		<>
 			{notification && <Notification message={notification} onClose={handleCloseNotification} />}
-			<Area grid={grid} ships={ships} onShot={handleShot}/>
+			<Area grid={grid} ships={ships} onShot={handleShot} />
 			{destroyedShipsCount === ships.length && <button onClick={handleRestartGame}>Restart the game</button>}
 		</>
 	);
