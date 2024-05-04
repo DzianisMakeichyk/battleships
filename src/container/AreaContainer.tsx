@@ -4,23 +4,15 @@ import { Area, ShipProps, CellProps, Notification } from '../components';
 
 type Grid = CellProps[][];
 
-const initialGrid: Grid = Array.from({ length: 10 }, () =>
-	Array.from({ length: 10 }, () => ({
-		isHit: false,
-		isShip: false,
-		shipId: 0,
-		onClick: () => {},
-	}))
-);
-
-const ships: ShipProps[] = [
+const initialShips: ShipProps[] = [
 	{ id: 1, name: 'Battleship 1', length: 5, framesHit: 0, position: { row: 0, col: 0 } },
 	{ id: 2, name: 'Battleship 2', length: 4, framesHit: 0, position: { row: 0, col: 0 } },
 	{ id: 3, name: 'Battleship 3', length: 4, framesHit: 0, position: { row: 0, col: 0 } },
 ];
 
 const AreaContainer: FC = () => {
-	const [grid, setGrid] = useState<Grid>(initialGrid);
+	const [grid, setGrid] = useState<Grid>([]);
+	const [ships, setShips] = useState<ShipProps[]>(initialShips);
 	const placedShipsRef = useRef<boolean>(false);
 	const [notification, setNotification] = useState<string | null>(null);
 	const [destroyedShipsCount, setDestroyedShipsCount] = useState<number>(0);
@@ -30,7 +22,7 @@ const AreaContainer: FC = () => {
 
 		placeShips();
 		placedShipsRef.current = true;
-	}, []);
+	}, [placedShipsRef.current, ships]);
 
 	useEffect(() => {
 		if (destroyedShipsCount === ships.length) {
@@ -39,7 +31,14 @@ const AreaContainer: FC = () => {
 	}, [destroyedShipsCount]);
 
 	const placeShips = (): void => {
-		const newGrid: Grid = [...initialGrid];
+		const newGrid: Grid = Array.from({ length: 10 }, () =>
+			Array.from({ length: 10 }, () => ({
+				isHit: false,
+				isShip: false,
+				shipId: 0,
+				onClick: () => {},
+			}))
+		);
 
 		ships.forEach((ship) => placeShipRandomly(ship, newGrid));
 
@@ -147,31 +146,25 @@ const AreaContainer: FC = () => {
 	};
 
 	const handleRestartGame = (): void => {
-		const newGrid: Grid = Array.from({ length: 10 }, () =>
-			Array.from({ length: 10 }, () => ({
-				isHit: false,
-				isShip: false,
-				shipId: 0,
-				onClick: () => {},
-			}))
-		);
-
-		setGrid(newGrid);
+		setGrid([]);
 		setNotification(null);
 		setDestroyedShipsCount(0);
 
-		ships.forEach((ship) => {
-			ship.framesHit = 0;
-			ship.position = { row: 0, col: 0, horizontal: false };
-		});
+		// Reset the position of each ship
+		const resetShips = ships.map((ship) => ({
+			...ship,
+			framesHit: 0,
+			position: { row: 0, col: 0 },
+		}));
 
 		placedShipsRef.current = false;
+		setShips(resetShips);
 	};
 
 	return (
 		<>
 			{notification && <Notification message={notification} onClose={handleCloseNotification} />}
-			<Area grid={grid} ships={ships} onShot={handleShot} />
+			<Area grid={grid} ships={ships} onShot={handleShot} showBattleArea />
 			{destroyedShipsCount === ships.length && <button onClick={handleRestartGame}>Restart the game</button>}
 		</>
 	);
