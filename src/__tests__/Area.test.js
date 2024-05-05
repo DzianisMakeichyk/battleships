@@ -1,12 +1,19 @@
 import { render, fireEvent } from '@testing-library/react';
+
 import { AreaContainer } from '../container/AreaContainer';
+import { ThemeProvider } from 'styled-components';
+import { lightTheme } from '../styles/Themes';
 
 describe('Area', () => {
 	let getAllByTestId;
 	let shipCells;
 
 	beforeEach(() => {
-		const result = render(<AreaContainer />);
+		const result = render(
+			<ThemeProvider theme={lightTheme}>
+				<AreaContainer />
+			</ThemeProvider>
+		);
 		getAllByTestId = result.getAllByTestId;
 		shipCells = getAllByTestId('ship-cell');
 	});

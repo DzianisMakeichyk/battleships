@@ -1,8 +1,8 @@
-import { FC } from 'react';
-import styled from 'styled-components';
+import { FC, Fragment } from 'react';
 
 import { ShipProps, Ship } from '../ship';
 import { Cell, CellProps } from '../cell';
+import { GridContainerStyled, LabelStyled, ShipListStyled } from './styles';
 
 interface AreaProps {
 	grid: CellProps[][];
@@ -11,35 +11,39 @@ interface AreaProps {
 	onShot: (row: number, col: number) => void;
 }
 
-const GridContainer = styled.div`
-	display: grid;
-	grid-template-columns: repeat(10, 30px);
-	grid-template-rows: repeat(10, 30px);
-	gap: 2px;
-`;
-
 const Area: FC<AreaProps> = ({ grid, ships, onShot, showBattleArea = false }) => {
+	const alphabet = 'ABCDEFGHIJ'.split('');
+
 	return (
 		<>
-			<GridContainer>
-				{grid.map((row, rowIndex) =>
-					row.map(({ isHit, shipId, isShip }, colIndex) => (
-						<Cell
-							key={`${rowIndex}-${colIndex}`}
-							isHidden={!showBattleArea}
-							isHit={isHit}
-							shipId={shipId}
-							isShip={isShip}
-							onClick={() => onShot(rowIndex, colIndex)}
-						/>
-					))
-				)}
-			</GridContainer>
-			<div>
-				{ships.map((ship) => (
-					<Ship key={ship.id} {...ship} />
+			<GridContainerStyled>
+				<LabelStyled /> {/* Empty cell at the top-left corner */}
+				{alphabet.map((letter, index) => (
+					<LabelStyled key={index}>{letter}</LabelStyled>
 				))}
-			</div>
+				{grid.map((row, rowIndex) => (
+					<Fragment key={rowIndex}>
+						<LabelStyled>{rowIndex + 1}</LabelStyled>
+						{row.map(({ isHit, shipId, isShip }, colIndex) => (
+							<Cell
+								key={`${rowIndex}-${colIndex}`}
+								isHidden={!showBattleArea}
+								isHit={isHit}
+								shipId={shipId}
+								isShip={isShip}
+								onClick={() => onShot(rowIndex, colIndex)}
+							/>
+						))}
+					</Fragment>
+				))}
+			</GridContainerStyled>
+			<ShipListStyled>
+				{ships.map((ship) => (
+					<li key={ship.id}>
+						<Ship {...ship} />
+					</li>
+				))}
+			</ShipListStyled>
 		</>
 	);
 };

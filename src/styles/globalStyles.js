@@ -50,4 +50,26 @@ export const GlobalStyles = createGlobalStyle`
   * {
     box-sizing: border-box;
   }
+
+  .notification-enter {
+  opacity: 0;
+  transform: translate(-50%, -100%);
+}
+
+.notification-enter-active {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.notification-exit {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.notification-exit-active {
+  opacity: 0;
+  transform: translate(-50%, -100%);
+  transition: opacity 300ms, transform 300ms;
+}
   `;

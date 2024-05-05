@@ -1,5 +1,8 @@
 import { render } from '@testing-library/react';
+
 import { Ship } from '../components';
+import { ThemeProvider } from 'styled-components';
+import { lightTheme } from '../styles/Themes';
 
 describe('Ship', () => {
 	const shipProps = {
@@ -10,8 +13,12 @@ describe('Ship', () => {
 		position: { row: 2, col: 3, horizontal: true },
 	};
 
-	it('renders ship component correctly', () => {
-		const { getByText } = render(<Ship {...shipProps} />);
+	test('renders ship component correctly', () => {
+		const { getByText } = render(
+			<ThemeProvider theme={lightTheme}>
+				<Ship {...shipProps} />
+			</ThemeProvider>
+		);
 		expect(getByText(shipProps.name)).toBeInTheDocument();
 	});
 });

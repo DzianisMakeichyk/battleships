@@ -1,6 +1,7 @@
 import { FC, useState, useEffect, useRef } from 'react';
 
-import { Area, ShipProps, CellProps, Notification } from '../components';
+import { Area, ShipProps, CellProps, Notification, Button } from '../components';
+import { AreaContainerStyled, AreaWrapperStyled, ResteButtonWrapperStyled } from '../styles/styles';
 
 type Grid = CellProps[][];
 
@@ -101,8 +102,10 @@ const AreaContainer: FC = () => {
 		const ship = ships.find((ship) => ship.id === shipId);
 		if (!ship) return;
 
-		ship.framesHit++;
-		if (!checkIfShipSunk(ship)) return;
+		const updatedShip = { ...ship, framesHit: ship.framesHit + 1 }; // Create a new ship object with the updated framesHit
+		setShips(ships.map((s) => (s.id === ship.id ? updatedShip : s))); // Update the state of the hit ship
+
+		if (!checkIfShipSunk(updatedShip)) return;
 
 		setNotification(`You destroyed ${ship.name}!`);
 		setDestroyedShipsCount((prevCount) => prevCount + 1);
@@ -135,7 +138,7 @@ const AreaContainer: FC = () => {
 	const checkIfShipSunk = (ship: ShipProps): boolean => {
 		const isSunk = ship.framesHit === ship.length;
 		if (isSunk) {
-			ship.framesHit = 0;
+			setShips(ships.map((s) => (s.id === ship.id ? ship : s)));
 			return true;
 		}
 		return false;
@@ -162,11 +165,18 @@ const AreaContainer: FC = () => {
 	};
 
 	return (
-		<>
-			{notification && <Notification message={notification} onClose={handleCloseNotification} />}
-			<Area grid={grid} ships={ships} onShot={handleShot} showBattleArea />
-			{destroyedShipsCount === ships.length && <button onClick={handleRestartGame}>Restart the game</button>}
-		</>
+		<AreaContainerStyled>
+			<Notification message={notification} onClose={handleCloseNotification} />
+			<AreaWrapperStyled>
+				<Area grid={grid} ships={ships} onShot={handleShot} />
+
+				{destroyedShipsCount === ships.length && (
+					<ResteButtonWrapperStyled>
+						<Button onClick={handleRestartGame} text="Restart the game" />
+					</ResteButtonWrapperStyled>
+				)}
+			</AreaWrapperStyled>
+		</AreaContainerStyled>
 	);
 };
 
