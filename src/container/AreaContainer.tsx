@@ -5,6 +5,11 @@ import { CoordinateInputContainer } from './CoordinateInputContainer';
 
 type Grid = CellProps[][];
 
+type NotificationState = {
+	message: string | null;
+	timer?: number;
+};
+
 const initialShips: ShipProps[] = [
 	{ id: 1, name: 'Battleship 1', length: 5, framesHit: 0, position: { row: 0, col: 0 } },
 	{ id: 2, name: 'Battleship 2', length: 4, framesHit: 0, position: { row: 0, col: 0 } },
@@ -15,7 +20,7 @@ const AreaContainer: FC = () => {
 	const [grid, setGrid] = useState<Grid>([]);
 	const [ships, setShips] = useState<ShipProps[]>(initialShips);
 	const placedShipsRef = useRef<boolean>(false);
-	const [notification, setNotification] = useState<string | null>(null);
+	const [notification, setNotification] = useState<NotificationState>({ message: null });
 	const [destroyedShipsCount, setDestroyedShipsCount] = useState<number>(0);
 
 	useEffect(() => {
@@ -27,7 +32,10 @@ const AreaContainer: FC = () => {
 
 	useEffect(() => {
 		if (destroyedShipsCount === ships.length) {
-			setNotification("Congratulations! You've destroyed all ships!");
+			setNotification({
+				message: "Congratulations! You've destroyed all ships!",
+				timer: 7000,
+			});
 		}
 	}, [destroyedShipsCount]);
 
@@ -96,7 +104,9 @@ const AreaContainer: FC = () => {
 
 		if (!newGrid[row][col].isShip) return;
 
-		setNotification('You hit a ship!');
+		setNotification({
+			message: 'You hit a ship!',
+		});
 
 		const shipId = newGrid[row][col].shipId;
 		const ship = ships.find((ship) => ship.id === shipId);
@@ -107,7 +117,9 @@ const AreaContainer: FC = () => {
 
 		if (!checkIfShipSunk(updatedShip)) return;
 
-		setNotification(`You destroyed ${ship.name}!`);
+		setNotification({
+			message: `You destroyed ${ship.name}!`,
+		});
 		setDestroyedShipsCount((prevCount) => prevCount + 1);
 
 		const aroundShip = findCellsAroundShip(ship, newGrid);
@@ -145,12 +157,12 @@ const AreaContainer: FC = () => {
 	};
 
 	const handleCloseNotification = (): void => {
-		setNotification(null);
+		setNotification({ message: null });
 	};
 
 	const handleRestartGame = (): void => {
 		setGrid([]);
-		setNotification(null);
+		setNotification({ message: null });
 		setDestroyedShipsCount(0);
 
 		const resetShips = ships.map((ship) => ({
@@ -166,7 +178,7 @@ const AreaContainer: FC = () => {
 	return (
 		<AreaContainerStyled>
 			<CoordinateInputContainer onShot={handleShot} />
-			<Notification message={notification} onClose={handleCloseNotification} />
+			<Notification message={notification.message} timer={notification.timer} onClose={handleCloseNotification} />
 			<AreaWrapperStyled>
 				<Area grid={grid} ships={ships} onShot={handleShot} />
 				{destroyedShipsCount === ships.length && (
