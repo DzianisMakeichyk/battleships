@@ -4,13 +4,16 @@ import { CSSTransition } from 'react-transition-group';
 import { NotificationWrapperStyled } from './styles';
 import { Button } from '../button';
 
+export type NotificationType = 'error';
 interface NotificationProps {
 	message: string | null;
 	timer?: number;
+	type?: NotificationType;
+	closeButton?: string;
 	onClose: () => void;
 }
 
-const Notification: FC<NotificationProps> = ({ message, onClose, timer = 2000000 }) => {
+const Notification: FC<NotificationProps> = ({ message, onClose, timer = 1000, closeButton, type }) => {
 	const notificationRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -38,9 +41,9 @@ const Notification: FC<NotificationProps> = ({ message, onClose, timer = 2000000
 
 	return (
 		<CSSTransition in={!!message} timeout={300} classNames="notification" unmountOnExit>
-			<NotificationWrapperStyled ref={notificationRef}>
-				<p>{message}</p>
-				<Button onClick={onClose} text="Awesome!" />
+			<NotificationWrapperStyled ref={notificationRef} type={type}>
+				<p data-testid="notification-message">{message}</p>
+				<Button onClick={onClose} text={closeButton ?? 'Awesome!'} />
 			</NotificationWrapperStyled>
 		</CSSTransition>
 	);

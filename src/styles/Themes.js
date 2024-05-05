@@ -13,6 +13,7 @@ export const lightTheme = {
 		background: '#dddddd',
 		color: '#1c2226',
 	},
+	error: '#f44b18',
 
 	hover: {
 		body: '#1c2226',

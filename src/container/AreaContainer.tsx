@@ -1,7 +1,7 @@
 import { FC, useState, useEffect, useRef } from 'react';
-
 import { Area, ShipProps, CellProps, Notification, Button } from '../components';
 import { AreaContainerStyled, AreaWrapperStyled, ResteButtonWrapperStyled } from '../styles/styles';
+import { CoordinateInputContainer } from './CoordinateInputContainer';
 
 type Grid = CellProps[][];
 
@@ -59,12 +59,12 @@ const AreaContainer: FC = () => {
 			horizontal = Math.random() < 0.5;
 		} while (!canPlaceShip(row, col, ship.length, horizontal, newGrid));
 
-		ship.position = { row, col, horizontal }; // Store ship position and orientation
+		ship.position = { row, col, horizontal };
 		for (let i = 0; i < ship.length; i++) {
 			const curRow = horizontal ? row : row + i;
 			const curCol = horizontal ? col + i : col;
 			newGrid[curRow][curCol].isShip = true;
-			newGrid[curRow][curCol].shipId = ship.id; // Store ship ID in each cell
+			newGrid[curRow][curCol].shipId = ship.id;
 		}
 	};
 
@@ -102,8 +102,8 @@ const AreaContainer: FC = () => {
 		const ship = ships.find((ship) => ship.id === shipId);
 		if (!ship) return;
 
-		const updatedShip = { ...ship, framesHit: ship.framesHit + 1 }; // Create a new ship object with the updated framesHit
-		setShips(ships.map((s) => (s.id === ship.id ? updatedShip : s))); // Update the state of the hit ship
+		const updatedShip = { ...ship, framesHit: ship.framesHit + 1 };
+		setShips(ships.map((s) => (s.id === ship.id ? updatedShip : s)));
 
 		if (!checkIfShipSunk(updatedShip)) return;
 
@@ -153,7 +153,6 @@ const AreaContainer: FC = () => {
 		setNotification(null);
 		setDestroyedShipsCount(0);
 
-		// Reset the position of each ship
 		const resetShips = ships.map((ship) => ({
 			...ship,
 			framesHit: 0,
@@ -166,10 +165,10 @@ const AreaContainer: FC = () => {
 
 	return (
 		<AreaContainerStyled>
+			<CoordinateInputContainer onShot={handleShot} />
 			<Notification message={notification} onClose={handleCloseNotification} />
 			<AreaWrapperStyled>
 				<Area grid={grid} ships={ships} onShot={handleShot} />
-
 				{destroyedShipsCount === ships.length && (
 					<ResteButtonWrapperStyled>
 						<Button onClick={handleRestartGame} text="Restart the game" />
