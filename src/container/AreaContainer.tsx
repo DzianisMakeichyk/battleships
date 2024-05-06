@@ -1,5 +1,5 @@
 import { FC, useState, useEffect, useRef } from 'react';
-import { Area, ShipProps, CellProps, Notification, Button } from '../components';
+import { Area, ShipProps, CellProps, Notification, Button, NotificationType } from '../components';
 import { AreaContainerStyled, AreaWrapperStyled, ResteButtonWrapperStyled } from '../styles/styles';
 import { CoordinateInputContainer } from './CoordinateInputContainer';
 
@@ -8,6 +8,8 @@ type Grid = CellProps[][];
 type NotificationState = {
 	message: string | null;
 	timer?: number;
+	type?: NotificationType;
+	closeButton?: string;
 };
 
 const initialShips: ShipProps[] = [
@@ -175,10 +177,14 @@ const AreaContainer: FC = () => {
 		setShips(resetShips);
 	};
 
+	const handleError = (error: string): void => {
+		setNotification({ message: error, type: 'error', closeButton: 'Ok', timer: 10000 });
+	};
+
 	return (
 		<AreaContainerStyled>
-			<CoordinateInputContainer onShot={handleShot} />
-			<Notification message={notification.message} timer={notification.timer} onClose={handleCloseNotification} />
+			<CoordinateInputContainer onShot={handleShot} setError={handleError} />
+			<Notification {...notification} onClose={handleCloseNotification} />
 			<AreaWrapperStyled>
 				<Area grid={grid} ships={ships} onShot={handleShot} />
 				{destroyedShipsCount === ships.length && (

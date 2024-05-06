@@ -7,9 +7,11 @@ import { lightTheme } from '../styles/Themes';
 describe('Coordinate input', () => {
 	test('should call onShot function with correct coordinates when form is submitted with valid input', () => {
 		const onShotMock = jest.fn();
+		const setErrorMock = jest.fn();
+
 		const { getByLabelText, getByText } = render(
 			<ThemeProvider theme={lightTheme}>
-				<CoordinateInputContainer onShot={onShotMock} />
+				<CoordinateInputContainer onShot={onShotMock} setError={setErrorMock} />
 			</ThemeProvider>
 		);
 
@@ -23,19 +25,21 @@ describe('Coordinate input', () => {
 	});
 
 	test('should display error message when form is submitted with invalid input', () => {
-		const { getByLabelText, getByText, getByTestId } = render(
+		const onShotMock = jest.fn();
+		const setErrorMock = jest.fn();
+
+		const { getByLabelText, getByText } = render(
 			<ThemeProvider theme={lightTheme}>
-				<CoordinateInputContainer />
+				<CoordinateInputContainer onShot={onShotMock} setError={setErrorMock} />
 			</ThemeProvider>
 		);
-
 		const coordinateInput = getByLabelText('Enter coordinates:');
 		const submitButton = getByText('Fire!');
 
 		fireEvent.change(coordinateInput, { target: { value: 'Z1' } });
 		fireEvent.click(submitButton);
 
-		const errorMessage = getByTestId('notification-message');
-		expect(errorMessage).toHaveTextContent('Invalid coordinates! Please enter coordinates in the format "A1" to "J10".');
+		expect(onShotMock).not.toHaveBeenCalled();
+		expect(setErrorMock).toHaveBeenCalledWith('Invalid coordinates! Please enter coordinates in the format "A1" to "J10".');
 	});
 });

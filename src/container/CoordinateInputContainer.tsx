@@ -1,21 +1,17 @@
 import { ChangeEvent, FC, FormEvent, useState } from 'react';
 
-import { CoordinateForm, Notification } from '../components';
+import { CoordinateForm } from '../components';
 
 interface CoordinateInputProps {
 	onShot: (row: number, col: number) => void;
+	setError: (error: string) => void;
 }
 
-const CoordinateInputContainer: FC<CoordinateInputProps> = ({ onShot }) => {
+const CoordinateInputContainer: FC<CoordinateInputProps> = ({ onShot, setError }) => {
 	const [coordinateInput, setCoordinateInput] = useState('');
-	const [error, setError] = useState<string>('');
 
 	const handleCoordinateChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
 		setCoordinateInput(target.value);
-		setError('');
-	};
-
-	const handleCloseNotification = () => {
 		setError('');
 	};
 
@@ -36,15 +32,7 @@ const CoordinateInputContainer: FC<CoordinateInputProps> = ({ onShot }) => {
 	};
 
 	return (
-		<>
-			<CoordinateForm
-				coordinateInput={coordinateInput}
-				onCoordinateChange={handleCoordinateChange}
-				onCoordinateSubmit={handleCoordinateSubmit}
-			/>
-
-			<Notification message={error} onClose={handleCloseNotification} type="error" closeButton="Ok" timer={10000} />
-		</>
+		<CoordinateForm coordinateInput={coordinateInput} onCoordinateChange={handleCoordinateChange} onCoordinateSubmit={handleCoordinateSubmit} />
 	);
 };
 
