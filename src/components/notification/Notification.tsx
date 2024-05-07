@@ -40,7 +40,7 @@ const Notification: FC<NotificationProps> = ({ message, onClose, timer = 1000, c
 	}, [message, onClose, timer]);
 
 	return (
-		<CSSTransition in={!!message} timeout={300} classNames="notification" unmountOnExit>
+		<CSSTransition nodeRef={notificationRef} in={!!message} timeout={300} classNames="notification" unmountOnExit>
 			<NotificationWrapperStyled ref={notificationRef} type={type}>
 				<p data-testid="notification-message">{message}</p>
 				<Button onClick={onClose} text={closeButton ?? 'Awesome!'} />

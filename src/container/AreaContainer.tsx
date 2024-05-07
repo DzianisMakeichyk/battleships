@@ -16,16 +16,12 @@ const initialShips: ShipProps[] = [
 const AreaContainer: FC = () => {
 	const [grid, setGrid] = useState<Grid>([]);
 	const [ships, setShips] = useState<ShipProps[]>(initialShips);
-	const placedShipsRef = useRef<boolean>(false);
 	const [notification, setNotification] = useState<NotificationState>({ message: null });
 	const [destroyedShipsCount, setDestroyedShipsCount] = useState<number>(0);
 
 	useEffect(() => {
-		if (placedShipsRef.current) return;
-
 		placeShips();
-		placedShipsRef.current = true;
-	}, [placedShipsRef.current, ships]);
+	}, []);
 
 	useEffect(() => {
 		if (destroyedShipsCount === ships.length) {
@@ -168,8 +164,8 @@ const AreaContainer: FC = () => {
 			position: { row: 0, col: 0 },
 		}));
 
-		placedShipsRef.current = false;
 		setShips(resetShips);
+		placeShips();
 	};
 
 	const handleError = (error: string): void => {
@@ -181,7 +177,7 @@ const AreaContainer: FC = () => {
 			<CoordinateInputContainer onShot={handleShot} setError={handleError} />
 			<Notification {...notification} onClose={handleCloseNotification} />
 			<AreaWrapperStyled>
-				<Area grid={grid} ships={ships} onShot={handleShot} />
+				<Area grid={grid} ships={ships} onShot={handleShot} showBattleArea />
 				{destroyedShipsCount === ships.length && (
 					<ResteButtonWrapperStyled>
 						<Button onClick={handleRestartGame} text="Restart the game" />
