@@ -1,16 +1,11 @@
 import { FC, useState, useEffect, useRef } from 'react';
-import { Area, ShipProps, CellProps, Notification, Button, NotificationType } from '../components';
+import { Area, ShipProps, CellProps, Notification, Button, NotificationProps } from '../components';
 import { AreaContainerStyled, AreaWrapperStyled, ResteButtonWrapperStyled } from '../styles/styles';
 import { CoordinateInputContainer } from './CoordinateInputContainer';
 
 type Grid = CellProps[][];
 
-type NotificationState = {
-	message: string | null;
-	timer?: number;
-	type?: NotificationType;
-	closeButton?: string;
-};
+type NotificationState = Omit<NotificationProps, 'onClose'>;
 
 const initialShips: ShipProps[] = [
 	{ id: 1, name: 'Battleship 1', length: 5, framesHit: 0, position: { row: 0, col: 0 } },

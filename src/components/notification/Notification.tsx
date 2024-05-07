@@ -5,7 +5,7 @@ import { NotificationWrapperStyled } from './styles';
 import { Button } from '../button';
 
 export type NotificationType = 'error';
-interface NotificationProps {
+export interface NotificationProps {
 	message: string | null;
 	timer?: number;
 	type?: NotificationType;
