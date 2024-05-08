@@ -118,7 +118,6 @@ const AreaContainer: FC = () => {
 		const aroundShip = findCellsAroundShip(ship, newGrid);
 		aroundShip.forEach(([r, c]) => {
 			newGrid[r][c].isHit = true;
-			newGrid[r][c].color = 'red';
 		});
 
 		setGrid(newGrid);
@@ -177,7 +176,7 @@ const AreaContainer: FC = () => {
 			<CoordinateInputContainer onShot={handleShot} setError={handleError} />
 			<Notification {...notification} onClose={handleCloseNotification} />
 			<AreaWrapperStyled>
-				<Area grid={grid} ships={ships} onShot={handleShot} showBattleArea />
+				<Area grid={grid} ships={ships} onShot={handleShot} />
 				{destroyedShipsCount === ships.length && (
 					<ResteButtonWrapperStyled>
 						<Button onClick={handleRestartGame} text="Restart the game" />
