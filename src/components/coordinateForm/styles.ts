@@ -8,7 +8,7 @@ export const FormStyled = styled.form`
 	align-items: center;
 	gap: 10px;
 	padding: 20px;
-	border: ${({ theme }) => `1px solid ${theme.notification.background}`};
+	border: ${({ theme }) => `1px solid ${theme.form.border}`};
 	border-radius: 5px;
 `;
 
@@ -19,7 +19,7 @@ export const LabelStyled = styled.label`
 export const InputStyled = styled.input`
 	padding: 10px;
 	border-radius: 5px;
-	border: ${({ theme }) => `1px solid ${theme.notification.background}`};
+	border: ${({ theme }) => `1px solid ${theme.form.border}`};
 
 	&::placeholder {
 		font-style: italic;

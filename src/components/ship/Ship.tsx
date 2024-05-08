@@ -12,7 +12,7 @@ export interface ShipProps {
 
 const Ship: FC<ShipProps> = ({ name, length, framesHit }) => {
 	return (
-		<ShipStyled $isHited={length === framesHit}>
+		<ShipStyled $isHited={length === framesHit} $isWounded={framesHit > 0}>
 			<strong>{name}</strong> -{' '}
 			<i>
 				({length}/{framesHit})

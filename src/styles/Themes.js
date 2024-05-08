@@ -5,12 +5,17 @@ export const lightTheme = {
 	ship: {
 		missted: '#dddddd',
 		hited: '#f44b18',
+		wounded: '#ffe54c',
 	},
 	notification: {
 		background: '#fff',
 	},
+	form: {
+		border: '#333',
+	},
 	button: {
-		background: '#dddddd',
+		background: '#ffe54c',
+		border: '#333',
 		color: '#1c2226',
 	},
 	error: '#f44b18',
